@@ -1,0 +1,178 @@
+---
+- name: Create Azure VM
+  hosts: localhost
+  gather_facts: no
+  vars:
+      - resourcegroup_name: "bsch_project"
+      - admin_pub_path_name: "~/.ssh/id_rsa.pub"
+      - virtual_network: "bsch_project-vnet"
+      - virtual_network_subnet: "default"
+      - vm_tag: "bsch"
+      - vm_name: "{{vm_tag}}-testhost03"
+  tasks:
+      - name: Create Public IP address
+        azure_rm_publicipaddress:
+            resource_group: "{{resourcegroup_name}}"
+            allocation_method: Dynamic
+            domain_name: "{{vm_tag}}-todo-app"
+            name: "{{vm_name}}-pb-ip"
+      - name: Create Network Security Group that allows SSH - 3000
+        azure_rm_securitygroup:
+            resource_group: "{{resourcegroup_name}}"
+            name: "{{vm_name}}-sg"
+            rules:
+                - name: SSH
+                  protocol: Tcp
+                  destination_port_range: 22
+                  access: Allow
+                  priority: 1001
+                  direction: Inbound
+                - name: port_3000
+                  protocol: Tcp
+                  destination_port_range: 3000
+                  access: Allow
+                  priority: 1002
+                  direction: Inbound
+      - name: Create Virtual Network Interface Card
+        azure_rm_networkinterface:
+            resource_group: "{{resourcegroup_name}}"
+            name: "{{vm_name}}-nic"
+            virtual_network: "{{virtual_network}}"
+            subnet: "{{virtual_network_subnet}}"
+            public_ip_name: "{{vm_name}}-pb-ip"
+            security_group: "{{vm_name}}-sg"
+      - name: Create VM
+        azure_rm_virtualmachine:
+            resource_group: "{{resourcegroup_name}}"
+            name: "{{vm_name}}"
+            vm_size: Standard_DS1_v2
+            admin_username: azureuser
+            managed_disk_type: Standard_LRS
+            ssh_password_enabled: false
+            ssh_public_keys:
+                - path: /home/azureuser/.ssh/authorized_keys
+                  key_data: "{{lookup('file', '{{admin_pub_path_name}}') }}"
+            network_interfaces: "{{vm_name}}-nic"
+            image:
+                offer: "eurolinux-9-0-free"
+                publisher: eurolinuxspzoo1620639373013
+                sku: "eurolinux-9-0-free"
+                version: latest
+            plan:
+                name: "eurolinux-9-0-free"
+                product: "eurolinux-9-0-free"
+                publisher: "eurolinuxspzoo1620639373013"
+      - name: Get Public IP address
+        azure_rm_publicipaddress_info:
+            resource_group: "{{resourcegroup_name}}"
+            name: "{{vm_name}}-pb-ip"
+        register: output_ip_address
+      - name: Public IP of VM
+        debug:
+            msg: "The public IP is {{output_ip_address | json_query('publicipaddresses[].ip_address | [0]')}}."
+      - name: Write / Check Hosts file for Dockerservers
+        lineinfile:
+            path: /etc/ansible/hosts
+            line: "[dockerservers]"
+            create: yes
+      - name: Entering Server info to hosts file
+        lineinfile:
+            path: /etc/ansible/hosts
+            insertafter: EOF
+            line: "{{vm_name}} ansible_host={{(output_ip_address | json_query('publicipaddresses[].ip_address | [0]'))}}"
+      - name: Refresh inventory to ensure new hosts exist in hosts file.
+        meta: refresh_inventory
+
+- name: Docker Configuration and Creation
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+      - name: Creating a Docker rRepository
+        yum_repository:
+            description: Repo for Docker
+            name: docker-ce
+            baseurl: https://download.docker.com/linux/centos/9/x86_64/stable/
+            gpgcheck: no
+      - name: Installing Docker
+        remote_user: azureuser
+        package:
+            name: docker-ce
+            state: present
+      - name: Starting Docker services
+        service:
+            name: docker
+            state: started
+      - name: Installing python3-pip
+        package:
+            name: python3-pip
+            state: present
+      - name: Installing Docker SDK
+        become: yes
+        pip:
+            name: docker
+      - name: Installing Docker-Compose Pip - Root
+        become: yes
+        pip:
+            name: docker-compose
+      - name: Installing Docker-Compose Pip - User
+        pip:
+            name: docker-compose
+      - name: Add user to Docker Group
+        remote_user: azureuser
+        user:
+            name: "azureuser"
+            group: "docker"
+            append: yes
+      - name: Installing Docker-Compose
+        remote_user: azureuser
+        get_url:
+            url: https://github.com/docker/compose/releases/download/v2.7.0/docker-compose-linux-x86_64
+            dest: /usr/local/bin/docker-compose
+            mode: "u+x,g+x"
+      - name: Give permission to Docker-Compose
+        become: yes
+        file:
+            path: /usr/local/bin/docker-compose
+            owner: azureuser
+            group: docker
+            mode: "1777"
+      - name: Installing Git
+        remote_user: azureuser
+        yum:
+            name: git
+            state: present
+      - name: Making a directory on managed node
+        remote_user: azureuser
+        file:
+            path: /home/azureuser/todo_app/app
+            state: directory
+      - name: Pulling Todo App from Github
+        remote_user: azureuser
+        git:
+            repo: https://github.com/exbert/todo-app-project.git
+            dest: /home/azureuser/todo_app/app
+            version: master
+      - name: Find my public ip
+        uri:
+            url: http://ifconfig.me/ip
+            return_content: yes
+        register: ip_response
+      - name: Updating Index.html with the Hostname and IP address
+        blockinfile:
+            path: /home/azureuser/todo_app/app/src/static/index.html
+            marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+            insertafter: "<body>"
+            block: |
+                <h3>Welcome to {{ inventory_hostname }}</h3>
+                <h3>Public IP Address is :  {{ ip_response.content }}</h3>
+      - name: Starting Todo App from Docker-Compose
+        remote_user: azureuser
+        community.docker.docker_compose:
+            project_src: /home/azureuser/todo_app/app
+      - name: Setting Docker Service to start on reboot
+        command: sudo systemctl enable docker.service
+        become: yes
+      - name: Setting Containerd Service to start on reboot
+        command: sudo systemctl enable containerd.service
+        become: yes

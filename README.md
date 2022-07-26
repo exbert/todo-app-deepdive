@@ -1,29 +1,29 @@
-# PROGRAMING CHALLENGE
+## PROGRAMING CHALLENGE
 
-## [Description](#description)
+### [Description](#description)
 
-## [Inventory](#inventory)
+### [Inventory](#inventory)
 
-## [Logical Topology](#logical_topology)
+### [Logical Topology](#logical_topology)
 
-## [Ansible Playbook](#ansible_playbook)
+### [Ansible Playbook](#ansible_playbook)
 
-## [Challenges](#challenges)
+### [Challenges](#challenges)
 
-## [Conclusion](#conclusion)
+### [Conclusion](#conclusion)
 
 ---
 
-## Description <a name="description"></a>
+### Description <a name="description"></a>
 
-## Inventory <a name="inventory"></a>
+### Inventory <a name="inventory"></a>
 
-## Logical Topology <a name="logical_topology"></a>
+### Logical Topology <a name="logical_topology"></a>
 
 ![Logical Topology](https://github.com/exbert/todo-app-deepdive/blob/master/img/ansible_project_topology.png "Logical Topology")
 
-## Ansible Playbook <a name="ansible_playbook"></a>
+### Ansible Playbook <a name="ansible_playbook"></a>
 
-## Challenges <a name="challenges"></a>
+### Challenges <a name="challenges"></a>
 
-## Conclusion <a name="conclusion"></a>
+### Conclusion <a name="conclusion"></a>

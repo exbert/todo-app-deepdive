@@ -36,14 +36,14 @@ Application can be accessed with this url:
 
 ---
 
-..
+**Installed and to be installed virtual machines**
 
 | Name            | Description           | Value | Image                  | Python |
 | --------------- | --------------------- | ----- | ---------------------- | ------ |
 | bsch-ansible01  | Ansible Controller VM | -     | Centos 8.5             | 3.9.13 |
-| bsch-testhost0X | Created App VM        | -     | EuroLinux 9.0 (RedHat) | 3.9.10 |
+| bsch-testhost0X | App VM        | -     | EuroLinux 9.0 (RedHat) | 3.9.10 |
 
-..
+---
 
 **Application installed with the Playbook**
 
@@ -316,5 +316,26 @@ Application can be accessed with this url:
         ```
 
 ### **Challenges** <a name="challenges"></a>
+
+- **Python**
+    - With python choosing the version really important. Ansible and Docker depends on the right version. With this Python version also Pip makes some trouble. This can be upgraded anytime but wrong configuration brings problems.
+        >Choose the latest or most up-to-date version. For example; 3.9 , 3.10
+- **OS family**
+    - Choosing the os family is important because of Python version. Centos 8.5 comes with Python 3.6 so need to upgrade to 3.9 to support other packages.
+    - Another important point about choosing the os family is, if you choose Centos 8.5 which is end of its life brings difficult to find correct versions packages being used. 
+        > For Ansible Controller server it is Centos 8.5 but required many updates. But for App VMs choosen RedHat 9.0 (EuroLinux 9.0 for this project)
+- **DNS**
+    - Ansible manages its hosts mostly using their hostnames. It is also possible using with ip adresses but within this project all ip adresses used dynamic.
+        > For more bigger projects a DNS server can be used. Hostname reservation can be static but ip can be dynamic.
+- **VM Authentication**
+    - Authentication can be using username and password but in this project Certificate is used. It can create a security risk which all machines used same Certificate. 
+- **VM Public IP**
+    - IP address of the VM can be set static for future use. But in this project it has choosen to be dynamic.
+- **Docker Authorization**
+    - The user which installed Docker Engine, Python3, Pip and Docker-compose should be all same. If any of these is different during the VM creation and APP deployment it can fail.
+- **Getting the App**
+    - For this project Github choosen to get the App by using ansible git commands. But it can also be by sending the app from local repository.
+- **Docker Service**
+    - By default when docker is installed and docker compose brings the app up there is no problem. But when the VM rebooted even you can access the machine docker service is not running. So after installing the docker , its service should be set autostart on rebooo using systemctl.
 
 ### **Conclusion** <a name="conclusion"></a>

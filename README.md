@@ -75,9 +75,9 @@ Application can be accessed with this url:
     -   Default VM Name 
         >Get the VM name as a parameter unless it is specified uses the default value
         ```yaml
-        - name: Default server name
-          set_fact: server_name="testhost001"
-          when: server_name is undefined
+        - name: Default VM name
+          set_fact: vm_name="testhost001"
+          when: vm_name is undefined
         ```
     -   Create Public IP address
         >Creating a dynamic public IP address.

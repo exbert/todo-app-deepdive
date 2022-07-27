@@ -87,7 +87,7 @@ Application can be accessed with this url:
             resource_group: "{{resourcegroup_name}}"
             allocation_method: Dynamic
             domain_name: "{{vm_tag}}-todo-app"
-            name: "{{vm_name}}-pb-ip"
+            name: "{{vm_tag}}-{{vm_name}}-pb-ip"
         ```
     -   Create Network Security Group that allows SSH - 3000
         >Creating NSG with allowing SSH - and tcp port 3000
@@ -95,7 +95,7 @@ Application can be accessed with this url:
         - name: Create Network Security Group that allows SSH - 3000
           azure_rm_securitygroup:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}-sg"
+            name: "{{vm_tag}}-{{vm_name}}-sg"
             rules:
                 - name: SSH
                   protocol: Tcp
@@ -116,11 +116,11 @@ Application can be accessed with this url:
         - name: Create Virtual Network Interface Card
           azure_rm_networkinterface:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}-nic"
+            name: "{{vm_tag}}-{{vm_name}}-nic"
             virtual_network: "{{virtual_network}}"
             subnet: "{{virtual_network_subnet}}"
-            public_ip_name: "{{vm_name}}-pb-ip"
-            security_group: "{{vm_name}}-sg"
+            public_ip_name: "{{vm_tag}}-{{vm_name}}-pb-ip"
+            security_group: "{{vm_tag}}-{{vm_name}}-sg"
         ```
     -   Create VM
         >Creating the Virtual Machine
@@ -128,7 +128,7 @@ Application can be accessed with this url:
         - name: Create VM
           azure_rm_virtualmachine:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}"
+            name: "{{vm_tag}}-{{vm_name}}"
             vm_size: Standard_DS1_v2
             admin_username: azureuser
             managed_disk_type: Standard_LRS
@@ -136,7 +136,7 @@ Application can be accessed with this url:
             ssh_public_keys:
                 - path: /home/azureuser/.ssh/authorized_keys
                   key_data: "{{lookup('file', '{{admin_pub_path_name}}') }}"
-            network_interfaces: "{{vm_name}}-nic"
+            network_interfaces: "{{vm_tag}}-{{vm_name}}-nic"
             image:
                 offer: "eurolinux-9-0-free"
                 publisher: eurolinuxspzoo1620639373013
@@ -153,7 +153,7 @@ Application can be accessed with this url:
         - name: Get Public IP address
           azure_rm_publicipaddress_info:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}-pb-ip"
+            name: "{{vm_tag}}-{{vm_name}}-pb-ip"
         register: output_ip_address
         ```
     -   Write / Check Hosts file for Dockerservers
@@ -172,7 +172,7 @@ Application can be accessed with this url:
           lineinfile:
             path: /etc/ansible/hosts
             insertafter: EOF
-            line: "{{vm_name}} ansible_host={{(output_ip_address | json_query('publicipaddresses[].ip_address | [0]'))}}"
+            line: "{{vm_tag}}-{{vm_name}} ansible_host={{(output_ip_address | json_query('publicipaddresses[].ip_address | [0]'))}}"
         ```
     -   Refresh inventory to ensure new hosts exist in hosts file
         > Initiate to recheck the ansible/hosts file

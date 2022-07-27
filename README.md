@@ -1,16 +1,16 @@
 ## PROGRAMING CHALLENGE
 
-### [Description](#description)
+* [Description](#description)
 
-### [Inventory](#inventory)
+* [Inventory](#inventory)
 
-### [Logical Topology](#logical-topology)
+* [Logical Topology](#logical-topology)
 
-### [Ansible Playbook Analysis](#ansible-playbook-analysis)
+* [Ansible Playbook Analysis](#ansible-playbook-analysis)
 
-### [Challenges](#challenges)
+* [Challenges](#challenges)
 
-### [Conclusion](#conclusion)
+* [Conclusion](#conclusion)
 
 ***
 

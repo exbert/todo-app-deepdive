@@ -34,7 +34,7 @@ Application can be accessed with this url:
 
 [http://bsch-todo-app.germanywestcentral.cloudapp.azure.com:3000](http://bsch-todo-app.germanywestcentral.cloudapp.azure.com:3000)
 
-### **Inventory**
+## Inventory
 
 ---
 
@@ -58,7 +58,7 @@ Application can be accessed with this url:
 |                 | Docker-Compose     |
 |                 | Git                |
 
-### **Logical Topology**
+## Logical Topology
 
 ---
 

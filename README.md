@@ -58,12 +58,25 @@ Application can be accessed with this url:
 
 ### **Logical Topology** <a name="logical_topology"></a>
 
+---
+
 ![Logical Topology](https://github.com/exbert/todo-app-deepdive/blob/master/img/ansible_project_topology.png "Logical Topology")
 
 ### **Ansible Playbook Analysis** <a name="ansible_playbook_analysis"></a>
 
+---
+
+**The Playbook is here: [Ansible Playbook](https://github.com/exbert/todo-app-deepdive/blob/master/src/create_vm_docker_app.yml)**
+
 -   Create Azure VM
     >Azure VM creation script starts
+    -   Default VM Name 
+        >Get the VM name as a parameter unless it is specified uses the default value
+        ```yaml
+        - name: Default server name
+          set_fact: server_name="testhost001"
+          when: server_name is undefined
+        ```
     -   Create Public IP address
         >Creating a dynamic public IP address.
         ```yaml
@@ -317,6 +330,8 @@ Application can be accessed with this url:
 
 ### **Challenges** <a name="challenges"></a>
 
+---
+
 - **Python**
     - With python choosing the version really important. Ansible and Docker depends on the right version. With this Python version also Pip makes some trouble. This can be upgraded anytime but wrong configuration brings problems.
         >Choose the latest or most up-to-date version. For example; 3.9 , 3.10
@@ -339,3 +354,7 @@ Application can be accessed with this url:
     - By default when docker is installed and docker compose brings the app up there is no problem. But when the VM rebooted even you can access the machine docker service is not running. So after installing the docker , its service should be set autostart on rebooo using systemctl.
 
 ### **Conclusion** <a name="conclusion"></a>
+
+---
+
+In this challenge I have used Ansible to manage VM which is running a containerized application using Docker-Compose. In a brief, Ansible server takes the written playbook, connects to Azure and creates the defined VM instance. Later takes the application from the Github and builds it using Docker-Compose and brings up the application.

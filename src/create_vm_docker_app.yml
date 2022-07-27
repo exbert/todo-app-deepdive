@@ -8,18 +8,20 @@
       - virtual_network: "bsch_project-vnet"
       - virtual_network_subnet: "default"
       - vm_tag: "bsch"
-      - vm_name: "{{vm_tag}}-testhost03"
   tasks:
+      - name: Default VM name
+        set_fact: vm_name="testhost001"
+        when: vm_name is undefined
       - name: Create Public IP address
         azure_rm_publicipaddress:
             resource_group: "{{resourcegroup_name}}"
             allocation_method: Dynamic
             domain_name: "{{vm_tag}}-todo-app"
-            name: "{{vm_name}}-pb-ip"
+            name: "{{vm_tag}}-{{vm_name}}-pb-ip"
       - name: Create Network Security Group that allows SSH - 3000
         azure_rm_securitygroup:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}-sg"
+            name: "{{vm_tag}}-{{vm_name}}-sg"
             rules:
                 - name: SSH
                   protocol: Tcp
@@ -36,15 +38,15 @@
       - name: Create Virtual Network Interface Card
         azure_rm_networkinterface:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}-nic"
+            name: "{{vm_tag}}-{{vm_name}}-nic"
             virtual_network: "{{virtual_network}}"
             subnet: "{{virtual_network_subnet}}"
-            public_ip_name: "{{vm_name}}-pb-ip"
-            security_group: "{{vm_name}}-sg"
+            public_ip_name: "{{vm_tag}}-{{vm_name}}-pb-ip"
+            security_group: "{{vm_tag}}-{{vm_name}}-sg"
       - name: Create VM
         azure_rm_virtualmachine:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}"
+            name: "{{vm_tag}}-{{vm_name}}"
             vm_size: Standard_DS1_v2
             admin_username: azureuser
             managed_disk_type: Standard_LRS
@@ -52,7 +54,7 @@
             ssh_public_keys:
                 - path: /home/azureuser/.ssh/authorized_keys
                   key_data: "{{lookup('file', '{{admin_pub_path_name}}') }}"
-            network_interfaces: "{{vm_name}}-nic"
+            network_interfaces: "{{vm_tag}}-{{vm_name}}-nic"
             image:
                 offer: "eurolinux-9-0-free"
                 publisher: eurolinuxspzoo1620639373013
@@ -65,7 +67,7 @@
       - name: Get Public IP address
         azure_rm_publicipaddress_info:
             resource_group: "{{resourcegroup_name}}"
-            name: "{{vm_name}}-pb-ip"
+            name: "{{vm_tag}}-{{vm_name}}-pb-ip"
         register: output_ip_address
       - name: Public IP of VM
         debug:
@@ -79,16 +81,16 @@
         lineinfile:
             path: /etc/ansible/hosts
             insertafter: EOF
-            line: "{{vm_name}} ansible_host={{(output_ip_address | json_query('publicipaddresses[].ip_address | [0]'))}}"
-      - name: Refresh inventory to ensure new hosts exist in hosts file.
+            line: "{{vm_tag}}-{{vm_name}} ansible_host={{(output_ip_address | json_query('publicipaddresses[].ip_address | [0]'))}}"
+      - name: Refresh inventory to ensure new hosts exist in hosts file
         meta: refresh_inventory
 
 - name: Docker Configuration and Creation
   hosts: all
-  gather_facts: no
   become: yes
+  gather_facts: no
   tasks:
-      - name: Creating a Docker rRepository
+      - name: Creating a Docker Repository
         yum_repository:
             description: Repo for Docker
             name: docker-ce
@@ -153,7 +155,7 @@
             repo: https://github.com/exbert/todo-app-project.git
             dest: /home/azureuser/todo_app/app
             version: master
-      - name: Find my public ip
+      - name: Find Servers public ip
         uri:
             url: http://ifconfig.me/ip
             return_content: yes

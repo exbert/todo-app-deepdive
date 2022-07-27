@@ -14,7 +14,7 @@
 
 ***
 
-### **Description** <a name="description"></a>
+### <a href="#description">**Description**</a>
 
 ---
 
@@ -34,7 +34,7 @@ Application can be accessed with this url:
 
 [http://bsch-todo-app.germanywestcentral.cloudapp.azure.com:3000](http://bsch-todo-app.germanywestcentral.cloudapp.azure.com:3000)
 
-### **Inventory** <a name="inventory"></a>
+### <a href="#inventory">**Inventory**</a>
 
 ---
 
@@ -58,13 +58,13 @@ Application can be accessed with this url:
 |                 | Docker-Compose     |
 |                 | Git                |
 
-### **Logical Topology** <a name="logical_topology"></a>
+### <a href="#logical_topology">**Logical Topology**</a>
 
 ---
 
 ![Logical Topology](https://github.com/exbert/todo-app-deepdive/blob/master/img/ansible_project_topology.png "Logical Topology")
 
-### **Ansible Playbook Analysis** <a name="ansible_playbook_analysis"></a>
+### <a href="#ansible_playbook_analysis">**Ansible Playbook Analysis**</a>
 
 ---
 
@@ -330,7 +330,7 @@ Application can be accessed with this url:
           become: yes
         ```
 
-### **Challenges** <a name="challenges"></a>
+### <a href="#challenges">**Challenges**</a>
 
 ---
 
@@ -355,7 +355,7 @@ Application can be accessed with this url:
 - **Docker Service**
     - By default when docker is installed and docker compose brings the app up there is no problem. But when the VM rebooted even you can access the machine docker service is not running. So after installing the docker , its service should be set autostart on rebooo using systemctl.
 
-### **Conclusion** <a name="conclusion"></a>
+### <a href="#conclusion">**Conclusion**</a>
 
 ---
 

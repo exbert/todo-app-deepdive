@@ -4,9 +4,9 @@
 
 ### [Inventory](#inventory)
 
-### [Logical Topology](#logical_topology)
+### [Logical Topology](#logical-topology)
 
-### [Ansible Playbook Analysis](#ansible_playbook_analysis)
+### [Ansible Playbook Analysis](#ansible-playbook-analysis)
 
 ### [Challenges](#challenges)
 
@@ -14,7 +14,7 @@
 
 ***
 
-### <a href="#description">**Description**</a>
+### **Description**
 
 ---
 
@@ -34,7 +34,7 @@ Application can be accessed with this url:
 
 [http://bsch-todo-app.germanywestcentral.cloudapp.azure.com:3000](http://bsch-todo-app.germanywestcentral.cloudapp.azure.com:3000)
 
-### <a href="#inventory">**Inventory**</a>
+### **Inventory**
 
 ---
 
@@ -58,13 +58,13 @@ Application can be accessed with this url:
 |                 | Docker-Compose     |
 |                 | Git                |
 
-### <a href="#logical_topology">**Logical Topology**</a>
+### **Logical Topology**
 
 ---
 
 ![Logical Topology](https://github.com/exbert/todo-app-deepdive/blob/master/img/ansible_project_topology.png "Logical Topology")
 
-### <a href="#ansible_playbook_analysis">**Ansible Playbook Analysis**</a>
+### **Ansible Playbook Analysis**
 
 ---
 
@@ -330,7 +330,7 @@ Application can be accessed with this url:
           become: yes
         ```
 
-### <a href="#challenges">**Challenges**</a>
+### **Challenges**
 
 ---
 
@@ -355,7 +355,7 @@ Application can be accessed with this url:
 - **Docker Service**
     - By default when docker is installed and docker compose brings the app up there is no problem. But when the VM rebooted even you can access the machine docker service is not running. So after installing the docker , its service should be set autostart on rebooo using systemctl.
 
-### <a href="#conclusion">**Conclusion**</a>
+### **Conclusion**
 
 ---
 
